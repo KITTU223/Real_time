@@ -12,6 +12,8 @@
   },
   "license": "MIT",
   "dependencies": {
+    "@babel/core": "^7.16.7",
+    "@babel/preset-env": "^7.16.7",
     "axios": "0.19.2",
     "bcrypt": "5.0.0",
     "connect-mongo": "3.2.0",
@@ -23,6 +25,7 @@
     "express-flash": "^0.0.2",
     "express-session": "^1.17.2",
     "laravel-mix": "5.0.4",
+    "moment": "2.27.0",
     "mongoose": "5.9.25",
     "nodemon": "^2.0.15",
     "noty": "^3.2.0-beta",

@@ -11,10 +11,7 @@ const flash = require('express-flash');
 const MongoDbStore = require('connect-mongo')(session)
 const passport = require('passport')
 
-
 app.use(express.static('public'));
-
-
 
 
 //database
@@ -27,7 +24,6 @@ connection.once('open', () =>{
         console.log('Connection failed...')
 
 });
-
 
 //session store
 let mongoStore = new MongoDbStore({
