@@ -10,6 +10,7 @@ const session = require('express-session');
 const flash = require('express-flash');
 const MongoDbStore = require('connect-mongo')(session)
 const passport = require('passport')
+const Emitter = require('events')
 
 app.use(express.static('public'));
 
@@ -24,12 +25,16 @@ connection.once('open', () =>{
         console.log('Connection failed...')
 
 });
-
 //session store
 let mongoStore = new MongoDbStore({
     mongooseConnection: connection,
     collection: 'sessions',
 })
+
+//event emitter
+const eventEmitter = new Emitter()
+app.set('eventEmitter', eventEmitter)
+
 //session config
 app.use(session({
     secret: process.env.COOKIE_SECRET,
@@ -40,7 +45,9 @@ app.use(session({
 }))
 
 //passport config
-const passportInit = require('./app/config/passport')
+const passportInit = require('./app/config/passport');
+const Server = require('socket.io');
+const EventEmitter = require('events');
 passportInit(passport)
 app.use(passport.initialize())
 app.use(passport.session())
@@ -66,6 +73,25 @@ app.set('view engine', 'ejs');
 
 require('./routes/web')(app)
 
-app.listen(PORT, () =>{
+const server = app.listen(PORT, () =>{
     console.log(`Listning on port ${PORT}`);
 }); 
+
+//socket
+
+const io = require('socket.io')(server)
+io.on('connection', (socket) => {
+      // Join
+      socket.on('join', (orderId) => {
+        socket.join(orderId)
+      })
+})
+
+
+eventEmitter.on('orderUpdated', (data) => {
+    io.to(`order_${data.id}`).emit('orderUpdated', data)
+})
+
+eventEmitter.on('orderPlaced', (data) => {
+    io.to('adminRoom').emit('orderPlaced', data)
+})
